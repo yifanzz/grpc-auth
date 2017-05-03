@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package test;
+
+import "protos/options.proto";
+
+message FooCreateRequest {
+
+  message Nested {
+    string string_field = 1;
+  }
+
+  string string_field = 1;
+  int32 int_field = 2;
+  Nested nested_field = 3;
+}
+
+message FooCreateResponse {}
+
+service FooService {
+	rpc Create(FooCreateRequest) returns (FooCreateResponse) {
+		option (grpcauth.auth_options).simple = {
+			path: "foo/{string_field}"
+		};
+	};
+}

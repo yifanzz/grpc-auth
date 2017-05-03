@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package grpcauth;
+
+option go_package = "options";
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.MethodOptions {
+	//The id is a globally unique id for this option, assigned by
+	// protobuf-global-extension-registry@google.com.
+	AuthMethodOptions auth_options = 12022;
+}
+
+message AuthMethodOptions {
+
+	message Simple {
+		// Path resource.
+		string path = 1;
+	}
+
+	Simple simple = 1;
+}
