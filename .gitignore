@@ -1,3 +1,6 @@
 /bazel-*
 /*.sublime-*
 build.log
+/*.log
+/.gopath
+/.idea/

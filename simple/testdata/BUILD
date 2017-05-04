@@ -8,6 +8,7 @@ go_proto_library(
     "@org_pubref_rules_protobuf//go",
     "//:grpc-auth",
   ],
+  verbose = 0,
 )
 
 go_test(

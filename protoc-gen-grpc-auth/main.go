@@ -8,6 +8,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/plugin"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/yifanz/grpc-auth/plugin"
 	"github.com/yifanz/grpc-auth/protos/go_default_proto_library"
 )
 
@@ -22,7 +23,7 @@ func main() {
 		return
 	}
 
-	fmt.Fprintf(os.Stderr, ">>>>> generating for file %+v with param: %v\n", request.FileToGenerate, *request.Parameter)
+	fmt.Fprintf(os.Stderr, ">>>>> generating for file %+v\n", request.FileToGenerate)
 	for _, f := range request.ProtoFile {
 		generate(f)
 	}
@@ -34,7 +35,10 @@ func generate(file *descriptor.FileDescriptorProto) {
 			if m.Options == nil || !proto.HasExtension(m.Options, options.E_AuthOptions) {
 				continue
 			}
-			println("got method that has auth option", *m.Name)
+			rawOptions, _ := proto.GetExtension(m.Options, options.E_AuthOptions)
+			authOptions := rawOptions.(*options.AuthMethodOptions)
+
+			fmt.Printf("got method %s that has auth option %+v", *m.Name, authOptions.Simple.Path)
 		}
 	}
 }
