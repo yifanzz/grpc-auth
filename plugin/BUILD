@@ -5,10 +5,10 @@ go_library(
     srcs = glob(["*.go"]),
     visibility = ["//visibility:public"],
     deps = [
-        "@com_github_gogo_protobuf//proto:go_default_library",
-        "@com_github_gogo_protobuf//gogoproto:go_default_library",
-        "@com_github_gogo_protobuf//protoc-gen-gogo/descriptor:go_default_library",
-        "@com_github_gogo_protobuf//protoc-gen-gogo/generator:go_default_library",
+      "//protos:go_default_proto_library",
+        "@com_github_golang_protobuf//proto:go_default_library",
+        "@com_github_golang_protobuf//protoc-gen-go/generator:go_default_library",
+        "@com_github_golang_protobuf//protoc-gen-go/descriptor:go_default_library",
     ],
 )
 

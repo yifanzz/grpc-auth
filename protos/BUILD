@@ -3,14 +3,16 @@ load("@org_pubref_rules_protobuf//go:rules.bzl", "go_proto_library")
 filegroup(
     name = "default_protos",
     srcs = [
-        "options.proto",
+        "grpc/auth/options.proto",
     ],
     visibility = ["//visibility:public"],
 )
 
 go_proto_library(
   name = "go_default_proto_library",
-  protos = [ ":default_protos" ],
+  protos = [
+    ":default_protos",
+  ],
   langs = [
     "@org_pubref_rules_protobuf//go",
   ],

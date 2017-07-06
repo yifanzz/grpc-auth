@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package grpcauth;
+package grpc.auth;
 
 option go_package = "options";
 

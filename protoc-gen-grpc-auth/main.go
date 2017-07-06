@@ -4,12 +4,12 @@ import (
 	"io/ioutil"
 	"os"
 	"fmt"
+	"log"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/plugin"
-	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/yifanz/grpc-auth/plugin"
-	"github.com/yifanz/grpc-auth/protos/go_default_proto_library"
+	"strings"
 )
 
 func main() {
@@ -23,22 +23,36 @@ func main() {
 		return
 	}
 
+
 	fmt.Fprintf(os.Stderr, ">>>>> generating for file %+v\n", request.FileToGenerate)
-	for _, f := range request.ProtoFile {
-		generate(f)
+
+	var files []*plugin_go.CodeGeneratorResponse_File
+	for _, f := range request.GetProtoFile() {
+		generated, content, _ := plugin.Generate(f)
+		if generated {
+			files = append(files, &plugin_go.CodeGeneratorResponse_File{
+				Name: proto.String(strings.Replace(f.GetName(), ".proto", ".pb.auth.go", -1)),
+				Content: proto.String(content),
+			})
+		}
 	}
+	emitFiles(files)
 }
 
-func generate(file *descriptor.FileDescriptorProto) {
-	for _, svc := range file.Service {
-		for _, m := range svc.Method {
-			if m.Options == nil || !proto.HasExtension(m.Options, options.E_AuthOptions) {
-				continue
-			}
-			rawOptions, _ := proto.GetExtension(m.Options, options.E_AuthOptions)
-			authOptions := rawOptions.(*options.AuthMethodOptions)
+func emitFiles(out []*plugin_go.CodeGeneratorResponse_File) {
+	emitResp(&plugin_go.CodeGeneratorResponse{File: out})
+}
 
-			fmt.Printf("got method %s that has auth option %+v", *m.Name, authOptions.Simple.Path)
-		}
+func emitError(err error) {
+	emitResp(&plugin_go.CodeGeneratorResponse{Error: proto.String(err.Error())})
+}
+
+func emitResp(resp *plugin_go.CodeGeneratorResponse) {
+	buf, err := proto.Marshal(resp)
+	if err != nil {
+		log.Fatalf("failed to generate: %v", err)
+	}
+	if _, err := os.Stdout.Write(buf); err != nil {
+		log.Fatal(err)
 	}
 }

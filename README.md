@@ -1,8 +1,8 @@
 ```
-service DeploymentSrv {
-	rpc Create(DeploymentCreateRequest) returns (DeploymentCreateResponse) {
+service PingService {
+	rpc Ping(PingRequest) returns (PingResponse) {
 		option (grpcauth.simple) = {
-			path: "prj/{project_id.name}/dpl",
+			path: "resource/ping/{.int_value}",
 			verbs: [ perms.WRITE ]
 		}
 	};

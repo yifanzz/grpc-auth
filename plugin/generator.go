@@ -1,41 +1,36 @@
 package plugin
 
 import (
-	// "fmt"
-	//
-	// "github.com/gogo/protobuf/gogoproto"
-	// "github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
-	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
+	"github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/golang/protobuf/proto"
+	"github.com/yifanz/grpc-auth/protos/go_default_proto_library"
+
+	"bytes"
 )
 
-func init() {
-	generator.RegisterPlugin(NewSimpleAuthPlugin())
-}
+func Generate(file *descriptor.FileDescriptorProto) (bool, string, error) {
+	out := bytes.NewBuffer(nil)
+	fileGenerated := false
+	for _, svc := range file.GetService() {
+		for _, m := range svc.GetMethod() {
+			if m.Options == nil || !proto.HasExtension(m.Options, options.E_AuthOptions) {
+				continue
+			}
+			rawOptions, _ := proto.GetExtension(m.Options, options.E_AuthOptions)
+			authOptions := rawOptions.(*options.AuthMethodOptions)
 
-type simpleAuthPlugin struct {
-	*generator.Generator
-	generator.PluginImports
-}
-
-func NewSimpleAuthPlugin() *simpleAuthPlugin {
-	return &simpleAuthPlugin{}
-}
-
-func (p *simpleAuthPlugin) Name() string {
-	return "auth"
-}
-
-func (p *simpleAuthPlugin) Init(g *generator.Generator) {
-	p.Generator = g
-}
-
-func (p *simpleAuthPlugin) Generate(file *generator.FileDescriptor) {
-	println("generating some stuf")
-	for _, msg := range file.Messages() {
-		println(">>>> generating for ", *msg.Name)
+			if authOptions.Simple != nil {
+				fileGenerated = true
+				err := simpleAuthTemplate.Execute(out, &params{})
+				if err != nil {
+					return false, "", err
+				}
+			}
+		}
 	}
-	p.P("//test string")
+	return fileGenerated, out.String(), nil
 }
 
-func (p *simpleAuthPlugin) GenerateImports(file *generator.FileDescriptor) {
+type params struct {
+
 }

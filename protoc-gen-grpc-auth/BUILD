@@ -5,7 +5,6 @@ go_library(
     srcs = glob(["*.go"]),
     deps = [
       "//plugin:go_default_library",
-      "//protos:go_default_proto_library",
       "@com_github_golang_protobuf//proto:go_default_library",
       "@com_github_golang_protobuf//protoc-gen-go/plugin:go_default_library",
       "@com_github_golang_protobuf//protoc-gen-go/descriptor:go_default_library",
